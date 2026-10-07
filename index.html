@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spyware Digital Flash Cards</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f0ff;--ink:#14214d;--sub:#4a5580;--panel:#fff;--c:#4aa3ff;--t:#e3f1ff;--bar:#d9d2f5;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12142b;--ink:#eef0ff;--sub:#b5bbe0;--panel:#1d2044;--bar:#33376b}}
+:root[data-theme="dark"]{--bg:#12142b;--ink:#eef0ff;--sub:#b5bbe0;--panel:#1d2044;--bar:#33376b}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Nunito',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px 16px 24px}
+h1{font-family:'Fredoka',system-ui,sans-serif;font-size:clamp(34px,8vw,52px);margin:4px 0 0;text-align:center;letter-spacing:.5px}
+.sub{font-family:'Fredoka',system-ui,sans-serif;font-size:18px;color:var(--sub);margin:0 0 14px;text-align:center}
+.tag{font-size:14px;color:var(--sub);margin-bottom:12px}
+.bar{width:100%;max-width:460px;height:8px;background:var(--bar);border-radius:8px;overflow:hidden;margin-bottom:6px}
+.bar i{display:block;height:100%;width:10%;background:var(--c);transition:width .3s,background .3s}
+.count{font-size:14px;color:var(--sub);margin-bottom:12px}
+.scene{width:100%;max-width:460px;height:min(440px,62vh);min-height:340px;perspective:1200px;cursor:pointer;outline:none}
+.card{position:relative;width:100%;height:100%;transition:transform .55s cubic-bezier(.3,.7,.3,1);transform-style:preserve-3d}
+.card.flip{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:26px;border:3px solid var(--c);background:var(--t);padding:22px;display:flex;flex-direction:column;overflow:auto;color:#14214d}
+.back{transform:rotateY(180deg)}
+.pill{align-self:center;background:var(--c);color:#fff;font-family:'Fredoka',system-ui,sans-serif;font-weight:600;font-size:20px;padding:4px 22px;border-radius:30px;margin-bottom:12px}
+.front{align-items:center;justify-content:center;text-align:center;gap:10px}
+.front h2{font-family:'Fredoka',system-ui,sans-serif;font-size:clamp(30px,8vw,40px);margin:0}
+.ico{font-size:72px;line-height:1}
+.hint{font-size:14px;opacity:.7}
+.back h3{font-family:'Fredoka',system-ui,sans-serif;font-size:24px;text-align:center;margin:0 0 10px}
+.back p,.back li{font-size:19px;line-height:1.4;margin:0 0 8px;font-weight:700}
+.back ul{padding-left:22px;margin:0}
+.back small{display:block;font-size:15px;font-weight:500;opacity:.8}
+.types{list-style:none;padding:0}
+.types li{display:flex;gap:12px;align-items:center}
+.n{flex:none;width:34px;height:34px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;font-family:'Fredoka',system-ui,sans-serif}
+.take{background:rgba(255,255,255,.55);border-radius:18px;padding:18px;text-align:center}
+.take p{font-size:22px}
+.nav{display:flex;gap:12px;margin-top:16px;width:100%;max-width:460px}
+button{font:inherit;font-family:'Fredoka',system-ui,sans-serif;font-weight:600;font-size:18px;border:0;border-radius:16px;padding:14px;cursor:pointer;color:#fff;background:var(--c);flex:1}
+button.alt{background:var(--panel);color:var(--ink);border:2px solid var(--bar)}
+button:focus-visible,.scene:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.dots{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px;max-width:460px}
+.dots button{flex:none;width:36px;height:36px;padding:0;font-size:14px;background:var(--panel);color:var(--ink);border:2px solid var(--bar);border-radius:50%}
+.dots button.on{background:var(--c);color:#fff;border-color:var(--c)}
+@media (prefers-reduced-motion:reduce){.card,.bar i{transition:none}}
+</style>
+</head>
+<body>
+<h1>Spyware</h1>
+<p class="sub">Digital Flash Card</p>
+<div class="tag">Be Aware, Stay Safe</div>
+<div class="bar"><i id="fill"></i></div>
+<div class="count" id="count"></div>
+<div class="scene" id="scene" tabindex="0" role="button" aria-label="Flash card, press to flip">
+  <div class="card" id="card">
+    <div class="face front" id="front"></div>
+    <div class="face back" id="back"></div>
+  </div>
+</div>
+<div class="nav">
+  <button class="alt" id="prev">Previous</button>
+  <button id="flip">Flip</button>
+  <button class="alt" id="next">Next</button>
+</div>
+<div class="dots" id="dots"></div>
+<script>
+const L=a=>'<ul>'+a.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+const cards=[
+{t:'What is Spyware?',i:'🕵️',c:'#4aa3ff',bg:'#e3f1ff',b:'<p>Spyware is a type of malicious software that secretly monitors a user\'s activities and collects information without their consent.</p>'},
+{t:'Why is it Important?',i:'🔍',c:'#8a63e0',bg:'#ece5ff',b:L(['Steals personal and sensitive information.','Can lead to financial loss, identity theft and privacy breaches.','Often works silently in the background.'])},
+{t:'Common Types',i:'🧩',c:'#2fa866',bg:'#dcf6e7',b:'<ul class="types"><li><span class="n">1</span><span>Adware Spyware<small>(shows unwanted ads)</small></span></li><li><span class="n">2</span><span>Keylogger Spyware<small>(captures keystrokes)</small></span></li><li><span class="n">3</span><span>Browser Hijacker<small>(changes browser settings)</small></span></li><li><span class="n">4</span><span>Remote Access Spyware<small>(gives attackers control)</small></span></li></ul>'},
+{t:'Examples',i:'📱',c:'#d9a512',bg:'#fff4c9',b:L(['Pegasus (mobile spyware)','FinFisher','Zango','CoolWebSearch','Browser helper objects (BHOs)'])},
+{t:'Where it Spreads',i:'🦠',c:'#e8527a',bg:'#ffe1ea',b:L(['Free software downloads','Suspicious email attachments','Fake websites &amp; pop-ups','Cracked software','Infected USB drives'])},
+{t:'Signs of Infection',i:'⚠️',c:'#1fae9a',bg:'#d9f6f0',b:L(['Slower device performance','Unknown apps or processes','Frequent pop-ups and ads','Changes in browser settings','Unusual data usage'])},
+{t:'How to Prevent',i:'🛡️',c:'#ee6a5b',bg:'#ffe4df',b:L(['Download only from trusted sources.','Keep OS and apps updated.','Use reliable antivirus software.','Avoid clicking on unknown links or attachments.','Be careful with app permissions.'])},
+{t:'How to Remove',i:'⚙️',c:'#6c55d6',bg:'#e8e3ff',b:L(['Uninstall suspicious programs.','Reset browser settings.','Clear cache and cookies.','Run a full antivirus/anti-spyware scan.','Check and remove unknown browser extensions.'])},
+{t:'Best Practices',i:'🔒',c:'#2f86e8',bg:'#dfeeff',b:L(['Use strong, unique passwords.','Enable two-factor authentication.','Keep your system and browser updated.','Be cautious with downloads and links.'])},
+{t:'Key Takeaway',i:'💜',c:'#7d5bd6',bg:'#e6dcff',b:'<div class="take"><p>Spyware may be invisible, but its impact is real.</p><p>Stay alert, stay protected!</p></div>'}
+];
+let cur=0;
+const $=id=>document.getElementById(id),card=$('card');
+function show(n){
+  cur=(n+cards.length)%cards.length;const d=cards[cur];
+  card.classList.remove('flip');
+  const r=document.documentElement.style;r.setProperty('--c',d.c);r.setProperty('--t',d.bg);
+  const pill='<div class="pill">Card '+(cur+1)+'</div>';
+  $('front').innerHTML=pill+'<div class="ico">'+d.i+'</div><h2>'+d.t+'</h2><div class="hint">Tap to flip</div>';
+  $('back').innerHTML=pill+'<h3>'+d.t+'</h3>'+d.b;
+  $('fill').style.width=((cur+1)/cards.length*100)+'%';
+  $('count').textContent='Card '+(cur+1)+' of '+cards.length;
+  document.querySelectorAll('.dots button').forEach((b,i)=>b.classList.toggle('on',i===cur));
+}
+const flip=()=>card.classList.toggle('flip');
+cards.forEach((_,i)=>{const b=document.createElement('button');b.textContent=i+1;b.setAttribute('aria-label','Go to card '+(i+1));b.onclick=()=>show(i);$('dots').appendChild(b)});
+$('scene').onclick=flip;$('flip').onclick=flip;
+$('prev').onclick=()=>show(cur-1);$('next').onclick=()=>show(cur+1);
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight')show(cur+1);else if(e.key==='ArrowLeft')show(cur-1);
+  else if((e.key===' '||e.key==='Enter')&&document.activeElement===$('scene')){e.preventDefault();flip()}
+});
+let sx=null;
+$('scene').addEventListener('touchstart',e=>{sx=e.touches[0].clientX},{passive:true});
+$('scene').addEventListener('touchend',e=>{if(sx===null)return;const dx=e.changedTouches[0].clientX-sx;sx=null;if(Math.abs(dx)>60){show(cur+(dx<0?1:-1))}});
+show(0);
+</script>
+</body>
+</html>
